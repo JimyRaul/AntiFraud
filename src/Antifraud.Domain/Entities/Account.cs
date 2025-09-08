@@ -11,7 +11,14 @@ public class Account
     public bool IsActive { get; private set; }
 
     // Constructor privado para EF Core
-    private Account() { }
+    private Account()
+    {
+        Id = default!;
+        AccountNumber = string.Empty;
+        HolderName = string.Empty;
+        CreatedAt = DateTime.UtcNow;
+        IsActive = false;
+    }
 
     private Account(AccountId id, string accountNumber, string holderName)
     {

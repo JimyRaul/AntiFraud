@@ -20,7 +20,17 @@ public class Transaction
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     // Constructor privado para EF Core
-    private Transaction() { }
+    private Transaction()
+    {
+        Id = default!;
+        SourceAccountId = default!;
+        TargetAccountId = default!;
+        TransferTypeId = default!;
+        Value = default!;
+        Status = default!;
+        CreatedAt = default;
+        UpdatedAt = null;
+    }
 
     // Constructor para crear nueva transacción
     private Transaction(
@@ -64,7 +74,7 @@ public class Transaction
             value);
     }
 
-    public void UpdateStatus(TransactionStatus newStatus, string reason = null)
+    public void UpdateStatus(TransactionStatus newStatus, string? reason = null)
     {
         if (Status == newStatus)
             return;
@@ -77,7 +87,7 @@ public class Transaction
             Id,
             previousStatus,
             newStatus,
-            reason,
+            reason ?? string.Empty,
             UpdatedAt.Value));
     }
 
