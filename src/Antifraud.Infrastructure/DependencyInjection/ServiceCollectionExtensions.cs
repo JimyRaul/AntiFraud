@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Antifraud.Application.Interfaces;
@@ -13,7 +12,6 @@ using Antifraud.Infrastructure.Persistence;
 using Antifraud.Infrastructure.Persistence.Repositories;
 using Antifraud.Infrastructure.Services;
 using Antifraud.Infrastructure.HealthChecks;
-
 
 namespace Antifraud.Infrastructure.DependencyInjection;
 

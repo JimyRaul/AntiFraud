@@ -37,6 +37,7 @@ public class TransactionDomainService : ITransactionDomainService
         // Verificar regla de monto máximo por transacción
         if (transaction.Value.IsGreaterThan(MaxTransactionAmount))
         {
+            Console.WriteLine($"Transaction amount {transaction.Value} exceeds the maximum allowed amount of {MaxTransactionAmount}");
             return $"Transaction amount {transaction.Value} exceeds the maximum allowed amount of {MaxTransactionAmount}";
         }
 
@@ -48,6 +49,7 @@ public class TransactionDomainService : ITransactionDomainService
         
         if (newDailyTotal.IsGreaterThan(MaxDailyAmount))
         {
+            Console.WriteLine($"Daily accumulated amount {newDailyTotal} would exceed the maximum daily limit of {MaxDailyAmount}. Current daily total: {dailyAccumulated}");
             return $"Daily accumulated amount {newDailyTotal} would exceed the maximum daily limit of {MaxDailyAmount}. Current daily total: {dailyAccumulated}";
         }
 

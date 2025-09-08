@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Antifraud.Application.DTOs;
 using Antifraud.Application.Interfaces;
 using Antifraud.Domain.Entities;
@@ -12,18 +13,15 @@ namespace Antifraud.Application.Services;
 
 public class AntifraudService : IAntifraudService
 {
-    private readonly ITransactionRepository _transactionRepository;
-    private readonly ITransactionDomainService _transactionDomainService;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IEventPublisher _eventPublisher;
     private const string ValidationResponseTopic = "transaction-validation-response";
 
     public AntifraudService(
-        ITransactionRepository transactionRepository,
-        ITransactionDomainService transactionDomainService,
+        IServiceProvider serviceProvider,
         IEventPublisher eventPublisher)
     {
-        _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
-        _transactionDomainService = transactionDomainService ?? throw new ArgumentNullException(nameof(transactionDomainService));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
     }
 
@@ -31,8 +29,12 @@ public class AntifraudService : IAntifraudService
     {
         try
         {
+            using var scope = _serviceProvider.CreateScope();
+            var transactionRepository = scope.ServiceProvider.GetRequiredService<ITransactionRepository>();
+            var transactionDomainService = scope.ServiceProvider.GetRequiredService<ITransactionDomainService>();
+
             // Obtener la transacción del repositorio
-            var transaction = await _transactionRepository.GetByExternalIdAsync(transactionResponse.TransactionExternalId);
+            var transaction = await transactionRepository.GetByExternalIdAsync(transactionResponse.TransactionExternalId);
             
             if (transaction == null)
             {
@@ -41,11 +43,11 @@ public class AntifraudService : IAntifraudService
             }
 
             // Aplicar reglas de anti-fraude
-            var shouldReject = await _transactionDomainService.ShouldRejectTransactionAsync(transaction);
+            var shouldReject = await transactionDomainService.ShouldRejectTransactionAsync(transaction);
             
             if (shouldReject)
             {
-                var rejectionReason = await _transactionDomainService.GetRejectionReasonAsync(transaction);
+                var rejectionReason = await transactionDomainService.GetRejectionReasonAsync(transaction);
                 await SendValidationResponseAsync(transactionResponse.TransactionExternalId, "rejected", rejectionReason);
             }
             else
