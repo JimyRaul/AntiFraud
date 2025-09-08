@@ -38,7 +38,7 @@ public class TransactionRepository : ITransactionRepository
 
     public async Task<IEnumerable<Transaction>> GetByAccountIdAndDateAsync(AccountId accountId, DateTime date)
     {
-        var startOfDay = date.Date;
+        var startOfDay = date.ToUniversalTime().Date;
         var endOfDay = startOfDay.AddDays(1);
 
         return await _context.Transactions
@@ -51,7 +51,7 @@ public class TransactionRepository : ITransactionRepository
 
     public async Task<Money> GetDailyAccumulatedAmountAsync(AccountId accountId, DateTime date)
     {
-        var startOfDay = date.Date;
+        var startOfDay = date.ToUniversalTime().Date;
         var endOfDay = startOfDay.AddDays(1);
 
         var transactions = await _context.Transactions
